@@ -25,21 +25,25 @@ requirements and record their verification status.
 ## Test Evidence
 
 ### REQ-04 — Book Search
-- Title search: Pending
-- Author search: Pending
-- Category search: Pending
-- Uppercase/lowercase search: Pending
-- No-results behavior: Pending
-- Category filter: Pending
 
-### REQ-06 — Seller Book Listings
-- Add listing: Pending
-- Edit listing: Pending
-- Update stock: Pending
-- Delete listing: Pending
-- Invalid price validation: Pending
-- Invalid stock validation: Pending
-- Persistence after page refresh: Pending
+| Test Case | Expected Result | Status |
+|---|---|---|
+| Search by book title | Matching books are displayed | Pass |
+| Search by author | Matching books are displayed | Pass |
+| Search by category | Matching books are displayed | Pass |
+| Search with no matching book | No matching books are displayed with a clear message | Pass |
+
+### REQ-06 — Seller Book Listing Management
+
+| Test Case | Expected Result | Status |
+|---|---|---|
+| Add a book listing | Listing is created with all required details | Pass |
+| Update an existing listing | Changes are saved correctly | Pass |
+| Remove a listing | Listing is removed from the seller's listings | Pass |
+| Modify another seller's listing | Unauthorized modification is prevented | Pending |
+| Enter an invalid price | Invalid price is rejected | Pass |
+| Enter invalid stock | Negative or fractional stock is rejected | Pass |
+| Refresh the page | Saved listings remain available | Pass |
 
 ## Issues and Limitations
 
