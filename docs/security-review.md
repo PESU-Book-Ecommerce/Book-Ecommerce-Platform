@@ -31,3 +31,5 @@ Scope: files in the repository at the time of review (frontend/src).
 - Validate all inputs on the backend, not only in the frontend.
 - Re-run this review after the login, seller and cart features are merged.
 - The Sprint 2 cart prototype will store cart data in localStorage. This is acceptable for a demo, but cart totals and stock must be validated on the server.
+| 8 | HTTPS | No deployment configuration exists in the repo yet. HTTPS cannot be verified until deployment. | Not verifiable |
+| 9 | Order and payment data | No order, payment or user data handling exists in the repo yet. Cannot be verified. | Not verifiable |
