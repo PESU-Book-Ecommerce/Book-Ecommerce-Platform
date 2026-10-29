@@ -18,3 +18,13 @@ build/
 .vscode/
 .DS_Store
 Thumbs.db
+
+# Installed dependencies
+node_modules/
+
+# Environment variables and secrets
+.env
+.env.*
+
+# Logs
+*.log
