@@ -1,7 +1,7 @@
-
 const express = require("express");
 const router = express.Router();
 const Book = require("../models/Book");
+const { protect, authorize } = require("../middleware/authMiddleware");
 
 // GET: Retrieve all books
 router.get("/", async (req, res) => {
@@ -13,11 +13,18 @@ router.get("/", async (req, res) => {
   }
 });
 
-// POST: Add a new book
-router.post("/", async (req, res) => {
+// POST: Add a new book (Seller only)
+router.post("/", protect, authorize("seller"), async (req, res) => {
   try {
-    const { title, author, description, price, category, image, stock, sellerId } =
-      req.body;
+    const {
+      title,
+      author,
+      description,
+      price,
+      category,
+      image,
+      stock,
+    } = req.body;
 
     const book = new Book({
       title,
@@ -27,10 +34,11 @@ router.post("/", async (req, res) => {
       category,
       image,
       stock,
-      sellerId,
+      sellerId: req.user.id,
     });
 
     const savedBook = await book.save();
+
     res.status(201).json(savedBook);
   } catch (error) {
     res.status(400).json({ message: error.message });
