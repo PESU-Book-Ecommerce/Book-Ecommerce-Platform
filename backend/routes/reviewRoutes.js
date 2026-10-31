@@ -8,6 +8,7 @@ const { protect } = require("../middleware/authMiddleware");
 
 // GET: Retrieve approved reviews for a book
 router.get("/:bookId/reviews", async (req, res) => {
+    console.log("REVIEWS ROUTE REACHED");
   try {
     const { bookId } = req.params;
 

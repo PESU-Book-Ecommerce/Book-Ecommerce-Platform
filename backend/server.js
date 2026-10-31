@@ -16,12 +16,14 @@ const reviewRoutes = require("./routes/reviewRoutes");
 app.use(cors());
 app.use(express.json());
 
+app.use("/api/books", reviewRoutes);
+
 app.use("/api/books", bookRoutes);
+
+
 app.use("/api/auth", authRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/cart", cartRoutes);
-app.use("/api/books", reviewRoutes);
-// MongoDB connection
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
@@ -51,4 +53,4 @@ app.get("/api/health", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Backend running at http://localhost:${PORT}`);
 });
-
+module.exports = app;
