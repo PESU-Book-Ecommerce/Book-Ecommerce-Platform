@@ -23,7 +23,7 @@ export async function makePayment(orderId, paymentMethod, token) {
 
     return data;
   } catch (error) {
-    throw new Error(error.message || "Unable to process payment");
+    throw new Error("Payment request failed", { cause: error });
   }
 }
 
@@ -46,6 +46,6 @@ export async function getPaymentStatus(orderId, token) {
 
     return data;
   } catch (error) {
-    throw new Error(error.message || "Unable to retrieve payment status");
+    throw new Error("Payment request failed", { cause: error });
   }
 }
