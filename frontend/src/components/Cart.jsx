@@ -1,107 +1,120 @@
-
 import { useEffect, useState } from "react";
-import API_BASE from "../services/api";
+import {
+  getCart,
+  updateQuantity,
+  removeFromCart,
+  validateCart,
+} from "../services/cart";
+import "./Shop.css";
 
-function Cart({ token }) {
+export default function Cart({ token, onCheckout }) {
   const [items, setItems] = useState([]);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  async function loadCart() {
+  const [version, setVersion] = useState(0);
+  const loadCart = () => setVersion((v) => v + 1);
+
+  useEffect(() => {
+    let active = true;
+    getCart(token)
+      .then((data) => {
+        if (active) setItems(Array.isArray(data.cart) ? [] : data.cart.items || []);
+      })
+      .catch((error) => {
+        if (active) setMessage(error.message);
+      });
+    return () => {
+      active = false;
+    };
+  }, [token, version]);
+
+  async function handleQuantity(bookId, quantity) {
+    if (quantity < 1) return;
+    try {
+      setMessage("");
+      await updateQuantity(bookId, quantity, token);
+      loadCart();
+    } catch (error) {
+      setMessage(error.message);
+    }
+  }
+
+  async function handleRemove(bookId) {
+    try {
+      setMessage("");
+      await removeFromCart(bookId, token);
+      loadCart();
+    } catch (error) {
+      setMessage(error.message);
+    }
+  }
+
+  async function handleCheckout() {
     try {
       setLoading(true);
-      setError("");
-
-      const response = await fetch(`${API_BASE}/api/cart/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to load cart");
-      }
-
-      const cartItems = Array.isArray(data.cart)
-        ? data.cart
-        : data.cart?.items || [];
-
-      setItems(cartItems);
-    } catch (err) {
-      setError(err.message);
+      setMessage("");
+      const result = await validateCart(token);
+      setMessage(`Cart validated. Total payable: ₹${result.totalAmount}`);
+      if (onCheckout) onCheckout(result);
+    } catch (error) {
+      setMessage(error.message);
     } finally {
       setLoading(false);
     }
   }
 
-  async function removeBook(bookId) {
-    try {
-      const response = await fetch(
-        `${API_BASE}/api/cart/remove/${bookId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to remove book");
-      }
-
-      setMessage("Book removed successfully.");
-      await loadCart();
-    } catch (err) {
-      setError(err.message);
-    }
-  }
-
-  useEffect(() => {
-    if (token) loadCart();
-  }, [token]);
+  // Display-only total; the server recalculates it during validation
+  const total = items.reduce(
+    (sum, item) => sum + (item.bookId?.price || 0) * item.quantity,
+    0
+  );
 
   return (
-    <section className="shopping-cart">
-      <h2>Shopping Cart</h2>
+    <section className="shop-panel">
+      <h2>Your Cart</h2>
 
-      {loading && <p>Loading cart...</p>}
-      {error && <p>{error}</p>}
-      {message && <p>{message}</p>}
-
-      {!loading && items.length === 0 && (
-        <p>Your cart is empty.</p>
-      )}
+      {items.length === 0 && <p>Your cart is empty.</p>}
 
       {items.map((item) => {
         const book = item.bookId;
-
-        if (!book || typeof book !== "object") return null;
-
+        if (!book) return null;
         return (
-          <div className="cart-item" key={book._id}>
-            <h3>{book.title}</h3>
-            <p>Price: ₹{book.price}</p>
-            <p>Quantity: {item.quantity}</p>
-            <p>
-              Subtotal: ₹{book.price * item.quantity}
-            </p>
+          <div className="shop-row" key={book._id}>
+            <div className="shop-grow">
+              <strong>{book.title}</strong>
+              <div>₹{book.price} each · {book.stock} in stock</div>
+            </div>
 
-            <button onClick={() => removeBook(book._id)}>
+            <div className="shop-qty">
+              <button onClick={() => handleQuantity(book._id, item.quantity - 1)}>−</button>
+              <span>{item.quantity}</span>
+              <button
+                onClick={() => handleQuantity(book._id, item.quantity + 1)}
+                disabled={item.quantity >= book.stock}
+              >
+                +
+              </button>
+            </div>
+
+            <div className="shop-subtotal">₹{book.price * item.quantity}</div>
+            <button className="shop-danger" onClick={() => handleRemove(book._id)}>
               Remove
             </button>
           </div>
         );
       })}
 
-      <button onClick={loadCart}>Refresh Cart</button>
+      {items.length > 0 && (
+        <div className="shop-footer">
+          <strong>Total: ₹{total}</strong>
+          <button onClick={handleCheckout} disabled={loading}>
+            {loading ? "Validating..." : "Proceed to Checkout"}
+          </button>
+        </div>
+      )}
+
+      {message && <p role="status" className="shop-message">{message}</p>}
     </section>
   );
 }
-
-export default Cart;
