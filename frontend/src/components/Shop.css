@@ -1,0 +1,10 @@
+.shop-panel { max-width: 800px; margin: 20px auto; padding: 16px; }
+.shop-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #ddd; }
+.shop-grow { flex: 1; }
+.shop-qty { display: flex; align-items: center; gap: 8px; }
+.shop-subtotal { min-width: 70px; text-align: right; }
+.shop-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; }
+.shop-form { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; max-width: 400px; }
+.shop-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+.shop-danger { color: #b00020; }
+.shop-message { margin-top: 12px; }
