@@ -8,7 +8,6 @@ const { protect } = require("../middleware/authMiddleware");
 
 // GET: Retrieve approved reviews for a book
 router.get("/:bookId/reviews", async (req, res) => {
-    console.log("REVIEWS ROUTE REACHED");
   try {
     const { bookId } = req.params;
 
@@ -57,7 +56,7 @@ router.post("/:bookId/reviews", protect, async (req, res) => {
 
     if (
       comment !== undefined &&
-      (typeof comment !== "string" || comment.length > 1000)
+      (typeof comment !== "string" || comment.trim().length > 1000)
     ) {
       return res.status(400).json({
         success: false,
@@ -90,7 +89,7 @@ router.post("/:bookId/reviews", protect, async (req, res) => {
       bookId,
       userId: req.user.id,
       rating,
-      comment: comment || "",
+      comment: comment ? comment.trim() : "",
       isApproved: false,
     });
 

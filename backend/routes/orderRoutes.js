@@ -1,23 +1,24 @@
+
 const express = require("express");
 const router = express.Router();
+
+const mongoose = require("mongoose");
 
 const Order = require("../models/Order");
 const Cart = require("../models/Cart");
 const Book = require("../models/Book");
 
 const { protect, authorize } = require("../middleware/authMiddleware");
+
 // POST: Place an order (Customer only)
 router.post("/", protect, authorize("customer"), async (req, res) => {
+  const deductedItems = [];
+  let createdOrder = null;
+
   try {
     const { shippingAddress } = req.body;
 
-    if (!shippingAddress) {
-      return res.status(400).json({
-        success: false,
-        message: "Shipping address is required",
-      });
-    }
-
+    // Validate shipping address
     const requiredFields = [
       "fullName",
       "phone",
@@ -27,8 +28,22 @@ router.post("/", protect, authorize("customer"), async (req, res) => {
       "pincode",
     ];
 
+    if (
+      !shippingAddress ||
+      typeof shippingAddress !== "object" ||
+      Array.isArray(shippingAddress)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Shipping address is required",
+      });
+    }
+
     for (const field of requiredFields) {
-      if (!shippingAddress[field]) {
+      if (
+        typeof shippingAddress[field] !== "string" ||
+        !shippingAddress[field].trim()
+      ) {
         return res.status(400).json({
           success: false,
           message: `${field} is required`,
@@ -36,6 +51,21 @@ router.post("/", protect, authorize("customer"), async (req, res) => {
       }
     }
 
+    if (!/^\d{10}$/.test(shippingAddress.phone.trim())) {
+      return res.status(400).json({
+        success: false,
+        message: "Phone number must contain exactly 10 digits",
+      });
+    }
+
+    if (!/^\d{6}$/.test(shippingAddress.pincode.trim())) {
+      return res.status(400).json({
+        success: false,
+        message: "Pincode must contain exactly 6 digits",
+      });
+    }
+
+    // Find customer's cart
     const cart = await Cart.findOne({ userId: req.user.id });
 
     if (!cart || cart.items.length === 0) {
@@ -48,20 +78,24 @@ router.post("/", protect, authorize("customer"), async (req, res) => {
     const orderItems = [];
     let totalAmount = 0;
 
+    // Validate books and prepare order items
     for (const item of cart.items) {
+      if (
+        !Number.isInteger(item.quantity) ||
+        item.quantity < 1
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid book quantity in cart",
+        });
+      }
+
       const book = await Book.findById(item.bookId);
 
       if (!book) {
         return res.status(404).json({
           success: false,
           message: "A book in your cart was not found",
-        });
-      }
-
-      if (book.stock < item.quantity) {
-        return res.status(400).json({
-          success: false,
-          message: `Insufficient stock for ${book.title}`,
         });
       }
 
@@ -76,34 +110,110 @@ router.post("/", protect, authorize("customer"), async (req, res) => {
       totalAmount += book.price * item.quantity;
     }
 
-    for (const item of cart.items) {
-      await Book.findByIdAndUpdate(item.bookId, {
-        $inc: { stock: -item.quantity },
+    // Deduct stock using conditional atomic updates
+    for (const item of orderItems) {
+      const updatedBook = await Book.findOneAndUpdate(
+        {
+          _id: item.bookId,
+          stock: { $gte: item.quantity },
+        },
+        {
+          $inc: { stock: -item.quantity },
+      },
+        { new: true }
+      );
+
+      if (!updatedBook) {
+        throw new Error(`INSUFFICIENT_STOCK:${item.title}`);
+      }
+
+      deductedItems.push({
+        bookId: item.bookId,
+        quantity: item.quantity,
       });
     }
 
-    const order = await Order.create({
+    // Create order
+    createdOrder = await Order.create({
       userId: req.user.id,
       items: orderItems,
       totalAmount,
-      shippingAddress,
+      shippingAddress: {
+        fullName: shippingAddress.fullName.trim(),
+        phone: shippingAddress.phone.trim(),
+        addressLine: shippingAddress.addressLine.trim(),
+        city: shippingAddress.city.trim(),
+        state: shippingAddress.state.trim(),
+        pincode: shippingAddress.pincode.trim(),
+      },
     });
 
-    cart.items = [];
-    await cart.save();
+    // Clear cart only if it has not changed since it was read
+    const clearedCart = await Cart.updateOne(
+      {
+        _id: cart._id,
+        updatedAt: cart.updatedAt,
+      },
+      {
+        $set: { items: [] },
+      }
+    );
+
+    if (clearedCart.modifiedCount !== 1) {
+      throw new Error("CART_CHANGED");
+    }
 
     return res.status(201).json({
       success: true,
       message: "Order placed successfully",
-      order,
+      order: createdOrder,
     });
+
   } catch (error) {
+    // Roll back the order if it was created
+    if (createdOrder) {
+      try {
+        await Order.findByIdAndDelete(createdOrder._id);
+      } catch (rollbackError) {
+        console.error("Order rollback failed:", rollbackError);
+      }
+    }
+
+    // Restore deducted stock
+    for (const item of deductedItems) {
+      try {
+        await Book.updateOne(
+          { _id: item.bookId },
+          { $inc: { stock: item.quantity } }
+        );
+      } catch (rollbackError) {
+        console.error("Stock rollback failed:", rollbackError);
+      }
+    }
+
+    if (error.message.startsWith("INSUFFICIENT_STOCK:")) {
+      return res.status(409).json({
+        success: false,
+        message: `Insufficient stock for ${error.message.split(":")[1]}`,
+      });
+    }
+
+    if (error.message === "CART_CHANGED") {
+      return res.status(409).json({
+        success: false,
+        message: "Your cart changed during checkout. Please try again.",
+      });
+    }
+
+    console.error("Place order error:", error);
+
     return res.status(500).json({
       success: false,
       message: "Failed to place order",
     });
   }
 });
+
 // GET: Customer order history
 router.get("/my-orders", protect, authorize("customer"), async (req, res) => {
   try {
@@ -117,12 +227,15 @@ router.get("/my-orders", protect, authorize("customer"), async (req, res) => {
       orders,
     });
   } catch (error) {
+    console.error("Order history error:", error);
+
     return res.status(500).json({
       success: false,
       message: "Failed to retrieve order history",
     });
   }
 });
+
 // GET: Seller orders
 router.get("/seller-orders", protect, authorize("seller"), async (req, res) => {
   try {
@@ -145,12 +258,15 @@ router.get("/seller-orders", protect, authorize("seller"), async (req, res) => {
       orders: sellerOrders,
     });
   } catch (error) {
+    console.error("Seller orders error:", error);
+
     return res.status(500).json({
       success: false,
       message: "Failed to retrieve seller orders",
     });
   }
 });
+
 // PUT: Update order status (Seller only)
 router.put("/:orderId/status", protect, authorize("seller"), async (req, res) => {
   try {
@@ -167,6 +283,13 @@ router.put("/:orderId/status", protect, authorize("seller"), async (req, res) =>
       return res.status(400).json({
         success: false,
         message: "Invalid order status",
+      });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(req.params.orderId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid order ID",
       });
     }
 
@@ -201,7 +324,10 @@ router.put("/:orderId/status", protect, authorize("seller"), async (req, res) =>
       message: "Order status updated successfully",
       order,
     });
+
   } catch (error) {
+    console.error("Update order status error:", error);
+
     return res.status(500).json({
       success: false,
       message: "Failed to update order status",
