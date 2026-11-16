@@ -1,9 +1,8 @@
 
+
 import { useState } from "react";
 import "./Auth.css";
-
-const USERS_KEY = "bookstore_demo_users";
-const SESSION_KEY = "bookstore_demo_session";
+import { request } from "../services/http";
 
 const initialForm = {
   name: "",
@@ -12,15 +11,6 @@ const initialForm = {
   confirmPassword: "",
   role: "customer",
 };
-
-function getUsers() {
-  try {
-    const users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
-    return Array.isArray(users) ? users : [];
-  } catch {
-    return [];
-  }
-}
 
 function BookIcon() {
   return (
@@ -74,20 +64,13 @@ function EyeIcon({ visible }) {
   );
 }
 
-export default function Auth() {
-  const [mode, setMode] = useState("register");
+export default function Auth({ onAuthSuccess }) {
+  const [mode, setMode] = useState("login");
   const [form, setForm] = useState(initialForm);
   const [message, setMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  const [currentUser, setCurrentUser] = useState(() => {
-    try {
-      return JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null");
-    } catch {
-      return null;
-    }
-  });
+  const [loading, setLoading] = useState(false);
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -106,11 +89,11 @@ export default function Auth() {
     setShowConfirmPassword(false);
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
+    setMessage("");
 
     const email = form.email.trim().toLowerCase();
-    const users = getUsers();
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setMessage("Please enter a valid email address.");
@@ -132,104 +115,60 @@ export default function Auth() {
         setMessage("Passwords do not match.");
         return;
       }
+    }
 
-      if (users.some((user) => user.email === email)) {
-        setMessage("This email is already registered.");
-        return;
+    setLoading(true);
+
+    try {
+      if (mode === "register") {
+        const data = await request("/api/auth/register", {
+          method: "POST",
+          body: {
+            name: form.name.trim(),
+            email,
+            password: form.password,
+            role: form.role,
+          },
+        });
+
+        setMessage(
+          data.message || "Account created successfully. Please log in."
+        );
+
+        setMode("login");
+
+        setForm({
+          ...initialForm,
+          email,
+        });
+
+        setShowPassword(false);
+        setShowConfirmPassword(false);
+      } else {
+        const data = await request("/api/auth/login", {
+          method: "POST",
+          body: {
+            email,
+            password: form.password,
+          },
+        });
+
+        if (!data.token || !data.user) {
+          throw new Error("Invalid login response from server.");
+        }
+
+        onAuthSuccess({
+          user: data.user,
+          token: data.token,
+        });
       }
-
-      // Demo only. Do not store real passwords in browser storage.
-      const newUser = {
-        id: Date.now(),
-        name: form.name.trim(),
-        email,
-        password: form.password,
-        role: form.role,
-      };
-
-      localStorage.setItem(
-        USERS_KEY,
-        JSON.stringify([...users, newUser])
+    } catch (error) {
+      setMessage(
+        error.message || "Something went wrong. Please try again."
       );
-
-      setMessage("Account created successfully. Please log in.");
-      setMode("login");
-      setForm({
-        ...initialForm,
-        email,
-      });
-      setShowPassword(false);
-      setShowConfirmPassword(false);
-      return;
+    } finally {
+      setLoading(false);
     }
-
-    const matchedUser = users.find(
-      (user) =>
-        user.email === email &&
-        user.password === form.password
-    );
-
-    if (!matchedUser) {
-      setMessage("Invalid email or password.");
-      return;
-    }
-
-    const session = {
-      id: matchedUser.id,
-      name: matchedUser.name,
-      email: matchedUser.email,
-      role: matchedUser.role,
-    };
-
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
-    setCurrentUser(session);
-    setMessage("");
-  }
-
-  function logout() {
-    sessionStorage.removeItem(SESSION_KEY);
-    setCurrentUser(null);
-    setMode("login");
-    setForm(initialForm);
-    setMessage("");
-    setShowPassword(false);
-    setShowConfirmPassword(false);
-  }
-
-  if (currentUser) {
-    return (
-      <main className="auth-page">
-        <section className="auth-container auth-dashboard">
-          <div
-            className="auth-brand-mark"
-            role="img"
-            aria-label="Open book logo"
-          >
-            <BookIcon />
-          </div>
-
-          <h2>Welcome, {currentUser.name}!</h2>
-          <p>You are signed in to your bookstore account.</p>
-
-          <div className="account-details">
-            <p>
-              <strong>Email:</strong> {currentUser.email}
-            </p>
-            <p>
-              <strong>Account type:</strong> {currentUser.role}
-            </p>
-          </div>
-
-          <button
-            className="auth-primary"
-            type="button"
-            onClick={logout}
-          >
-            Logout
-          </button>
-        </section>
-      </main>
-    );
   }
 
   return (
@@ -262,7 +201,7 @@ export default function Auth() {
 
               <div className="auth-input-row">
                 <span className="auth-input-icon" aria-hidden="true">
-                  ♟
+                  ♙
                 </span>
 
                 <input
@@ -404,8 +343,16 @@ export default function Auth() {
             </p>
           )}
 
-          <button className="auth-primary" type="submit">
-            {mode === "register" ? "Sign Up" : "Login"}
+          <button
+            className="auth-primary"
+            type="submit"
+            disabled={loading}
+          >
+            {loading
+              ? "Please wait..."
+              : mode === "register"
+                ? "Sign Up"
+                : "Login"}
           </button>
         </form>
 

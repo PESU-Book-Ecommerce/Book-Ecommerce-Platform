@@ -1,10 +1,237 @@
-.shop-panel { max-width: 800px; margin: 20px auto; padding: 16px; }
-.shop-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #ddd; }
-.shop-grow { flex: 1; }
-.shop-qty { display: flex; align-items: center; gap: 8px; }
-.shop-subtotal { min-width: 70px; text-align: right; }
-.shop-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; }
-.shop-form { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; max-width: 400px; }
-.shop-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
-.shop-danger { color: #b00020; }
-.shop-message { margin-top: 12px; }
+
+.shop-panel {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 28px;
+  border: 1px solid #eae6de;
+  border-radius: 17px;
+  background: #fff;
+  color: #26384b;
+  box-shadow: 0 5px 20px #26384b0c;
+}
+
+.shop-panel h2 {
+  margin: 0 0 22px;
+  color: #243b53;
+  font-size: 26px;
+  font-weight: 750;
+}
+
+.shop-panel p {
+  color: #73777d;
+  line-height: 1.6;
+}
+
+.shop-panel button {
+  min-height: 39px;
+  padding: 9px 15px;
+  border: 0;
+  border-radius: 8px;
+  background: #243b53;
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.shop-panel button:hover:not(:disabled) {
+  background: #344f6d;
+  transform: translateY(-1px);
+}
+
+.shop-panel button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.shop-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 17px 0;
+  border-bottom: 1px solid #eeeae2;
+}
+
+.shop-row:last-child {
+  border-bottom: 0;
+}
+
+.shop-grow {
+  flex: 1;
+  min-width: 0;
+  color: #26384b;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.shop-grow strong {
+  color: #243b53;
+  font-size: 15px;
+}
+
+.shop-grow p {
+  margin: 5px 0 0;
+  font-size: 13px;
+}
+
+.shop-qty {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px;
+  border: 1px solid #e7e1d7;
+  border-radius: 9px;
+  background: #faf8f4;
+}
+
+.shop-qty button {
+  width: 30px;
+  min-height: 30px;
+  padding: 0;
+  border-radius: 7px;
+  background: #eae5dc;
+  color: #243b53;
+  font-size: 17px;
+}
+
+.shop-qty button:hover:not(:disabled) {
+  background: #d9cbb5;
+}
+
+.shop-qty span {
+  min-width: 20px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.shop-subtotal {
+  min-width: 85px;
+  color: #243b53;
+  font-weight: 750;
+  text-align: right;
+}
+
+.shop-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-top: 22px;
+  padding: 20px;
+  border: 1px solid #e8dfcf;
+  border-radius: 12px;
+  background: #fbf8f1;
+}
+
+.shop-footer strong {
+  color: #243b53;
+  font-size: 19px;
+}
+
+.shop-footer button {
+  min-height: 45px;
+  padding: 11px 20px;
+  background: #c17d45;
+  font-size: 14px;
+}
+
+.shop-footer button:hover:not(:disabled) {
+  background: #a96532;
+}
+
+.shop-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 450px;
+  margin-top: 18px;
+}
+
+.shop-form input,
+.shop-form textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #dedbd4;
+  border-radius: 9px;
+  background: #fdfcf9;
+  color: #26384b;
+  font: inherit;
+}
+
+.shop-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-bottom: 18px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eeeae2;
+}
+
+.shop-tabs button {
+  border: 1px solid #e3ddd2;
+  background: #f8f6f1;
+  color: #536171;
+}
+
+.shop-tabs button:disabled {
+  border-color: #243b53;
+  background: #243b53;
+  color: #fff;
+  opacity: 1;
+}
+
+.shop-danger {
+  flex-shrink: 0;
+  border: 1px solid #f0cccc !important;
+  background: #fff3f2 !important;
+  color: #b43d3d !important;
+}
+
+.shop-danger:hover:not(:disabled) {
+  background: #ffe3e0 !important;
+}
+
+.shop-message {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border: 1px solid #e8dfcf;
+  border-radius: 9px;
+  background: #fbf8f1;
+  color: #795b30 !important;
+  font-size: 14px;
+}
+
+@media (max-width: 650px) {
+  .shop-panel {
+    padding: 18px;
+  }
+
+  .shop-panel h2 {
+    font-size: 22px;
+  }
+
+  .shop-row {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .shop-grow {
+    flex-basis: 100%;
+  }
+
+  .shop-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .shop-footer button {
+    width: 100%;
+  }
+
+  .shop-subtotal {
+    text-align: left;
+  }
+}

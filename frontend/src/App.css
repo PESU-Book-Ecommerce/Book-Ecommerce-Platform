@@ -1,129 +1,746 @@
 
+/* =========================================
+   THE BOOK NOOK - GLOBAL APP STYLING
+========================================= */
+
+:root {
+  --navy: #1c3045;
+  --navy-light: #29445e;
+  --gold: #c7a36b;
+  --gold-light: #ead9b9;
+  --cream: #f8f6f1;
+  --white: #ffffff;
+  --ink: #263648;
+  --muted: #78818a;
+  --border: #e9e3d9;
+  --shadow: 0 8px 28px rgba(31, 45, 61, 0.07);
+}
+
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background-color: #f8f6f2;
-  color: #292524;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: "Segoe UI", Arial, sans-serif;
 }
 
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
 .header {
-  background-color: #243b53;
-  color: white;
-  padding: 20px 6%;
+  width: 100%;
+  min-height: 105px;
+  padding: 20px 7%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-.header h1 {
-  font-size: 24px;
-  margin: 0;
-}
-
-.header nav {
-  display: flex;
-  gap: 24px;
-}
-
-.header a {
+  gap: 20px;
+  background: var(--navy);
   color: white;
-  text-decoration: none;
 }
 
-.hero {
-  text-align: center;
-  padding: 65px 20px;
-  background-color: #e7edf4;
+.brand-area {
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
-.hero h2 {
-  font-size: 34px;
-  margin-bottom: 12px;
-}
-
-.hero input {
-  width: 100%;
-  max-width: 450px;
-  padding: 14px;
-  margin-top: 20px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 16px;
-}
-
-main {
-  padding: 40px 6%;
-  min-height: 350px;
-}
-
-.book-grid {
+.brand-icon {
+  width: 48px;
+  height: 48px;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 24px;
+  place-items: center;
+  border: 1px solid var(--gold);
+  border-radius: 12px;
+  color: var(--gold-light);
+  font-family: Georgia, serif;
+  font-size: 25px;
+  font-weight: bold;
+}
+
+.brand-area h1 {
+  margin: 0;
+  color: white;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 27px;
+  letter-spacing: 0.3px;
+}
+
+.welcome-text {
+  margin: 7px 0 0;
+  color: #c8d0d8;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+}
+
+.logout-button {
+  padding: 11px 21px;
+  border: 1px solid rgba(234, 217, 185, 0.6);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--gold-light);
+  font-size: 13px;
+  font-weight: 700;
+  transition: 0.2s ease;
+}
+
+.logout-button:hover {
+  background: var(--gold);
+  color: var(--navy);
+}
+
+/* =========================================
+   NAVIGATION
+========================================= */
+
+.dashboard-nav {
+  width: 100%;
+  min-height: 65px;
+  padding: 10px 7%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 3px 12px rgba(30, 45, 60, 0.035);
+}
+
+.dashboard-nav button {
+  padding: 12px 23px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: #5d6873;
+  font-size: 13px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.dashboard-nav button:hover {
+  background: #f6f1e8;
+  color: var(--navy);
+}
+
+.dashboard-nav button.active {
+  background: var(--navy);
+  color: white;
+  border-color: var(--navy);
+  box-shadow: 0 4px 12px rgba(28, 48, 69, 0.15);
+}
+
+/* =========================================
+   MAIN CONTENT
+========================================= */
+
+.dashboard-content {
+  width: 100%;
+  max-width: 1450px;
+  flex: 1;
+  margin: 0 auto;
+  padding: 38px 7% 55px;
+}
+
+.integration-panel {
+  width: 100%;
+  max-width: 1050px;
+  margin: 12px auto;
+  padding: 35px;
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  background: white;
+  box-shadow: var(--shadow);
+}
+
+.integration-panel h2 {
+  margin: 0 0 20px;
+  color: var(--navy);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 30px;
+}
+
+.integration-panel > p {
+  color: #697582;
+  line-height: 1.7;
+}
+
+/* =========================================
+   BUTTONS
+========================================= */
+
+.app button {
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.integration-panel button,
+.checkout-form button {
+  padding: 11px 19px;
+  border: 0;
+  border-radius: 7px;
+  background: var(--navy);
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.integration-panel button:hover,
+.checkout-form button:hover {
+  background: var(--navy-light);
+  transform: translateY(-1px);
+}
+
+.app button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.integration-panel button.secondary-button,
+.checkout-form button.secondary-button {
+  margin-left: 8px;
+  border: 1px solid var(--border);
+  background: #f4f1eb;
+  color: var(--navy);
+}
+
+.integration-panel button.secondary-button:hover,
+.checkout-form button.secondary-button:hover {
+  background: #eae3d7;
+}
+
+/* =========================================
+   NOTIFICATION MESSAGE
+========================================= */
+
+.app-message {
+  width: min(1100px, 86%);
+  margin: 20px auto 0;
+  padding: 13px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  border: 1px solid #d8e8d8;
+  border-radius: 9px;
+  background: #edf6ed;
+  color: #315d3c;
+  font-size: 13px;
+}
+
+.app-message button {
+  padding: 3px 8px;
+  border: 0;
+  background: transparent;
+  color: #315d3c;
+  font-size: 20px;
+}
+
+/* =========================================
+   CUSTOMER - HERO SECTION
+========================================= */
+
+.bookstore-hero {
+  min-height: 420px;
+  display: grid;
+  grid-template-columns: 1fr 0.9fr;
+  align-items: center;
+  gap: 35px;
+  padding: 45px 6%;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #eae5da;
+}
+
+.hero-copy {
+  max-width: 570px;
+}
+
+.hero-eyebrow,
+.collection-heading span,
+.reading-banner > span {
+  color: #a17b48;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2.2px;
+}
+
+.hero-copy h2 {
+  margin: 20px 0;
+  color: var(--navy);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(36px, 4vw, 55px);
+  line-height: 1.12;
+  font-weight: 500;
+}
+
+.hero-copy > p {
+  max-width: 480px;
+  color: #69727a;
+  font-size: 15px;
+  line-height: 1.9;
+}
+
+.hero-button {
+  margin-top: 18px;
+  padding: 14px 24px;
+  border: 0;
+  border-radius: 7px;
+  background: var(--navy);
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.hero-button:hover {
+  background: var(--navy-light);
+  transform: translateY(-2px);
+}
+
+.hero-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 35px;
+  margin-top: 35px;
+}
+
+.hero-stats div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.hero-stats strong {
+  color: var(--navy);
+  font-size: 11px;
+  letter-spacing: 1.5px;
+}
+
+.hero-stats span {
+  color: #78818a;
+  font-size: 11px;
+}
+
+/* =========================================
+   CUSTOMER - BOOK IMAGE COLLAGE
+========================================= */
+
+.hero-image {
+  position: relative;
+  min-height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.book-photo-grid {
+  position: relative;
+  width: 100%;
+  max-width: 460px;
+  height: 310px;
+}
+
+.book-photo {
+  position: absolute;
+  object-fit: cover;
+  border: 6px solid white;
+  border-radius: 10px;
+  box-shadow: 0 12px 30px rgba(29, 40, 52, 0.18);
+}
+
+.book-photo-main {
+  width: 58%;
+  height: 85%;
+  top: 7%;
+  left: 21%;
+  z-index: 2;
+}
+
+.book-photo-top {
+  width: 37%;
+  height: 49%;
+  top: 0;
+  right: 0;
+  transform: rotate(7deg);
+}
+
+.book-photo-bottom {
+  width: 38%;
+  height: 45%;
+  bottom: 0;
+  left: 0;
+  transform: rotate(-7deg);
+}
+
+.hero-floating-note {
+  position: absolute;
+  top: 5px;
+  left: 0;
+  z-index: 3;
+  padding: 10px 14px;
+  border-radius: 5px;
+  background: var(--gold);
+  color: var(--navy);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.hero-image-caption {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 13px 17px;
+  border-radius: 7px;
+  background: white;
+  box-shadow: var(--shadow);
+}
+
+.hero-image-caption span {
+  color: #a17b48;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.hero-image-caption strong {
+  color: var(--navy);
+  font-family: Georgia, serif;
+  font-size: 14px;
+}
+
+/* =========================================
+   CUSTOMER - READING BANNER
+========================================= */
+
+.reading-banner {
+  margin: 35px 0;
+  padding: 38px 25px;
+  text-align: center;
+  border-radius: 13px;
+  background: var(--navy);
+  color: white;
+}
+
+.reading-banner h2 {
+  margin: 12px 0;
+  color: white;
+  font-family: Georgia, serif;
+  font-size: 29px;
+  font-weight: 500;
+}
+
+.reading-banner p {
+  margin: 0;
+  color: #c6ced6;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/* =========================================
+   CUSTOMER - COLLECTION HEADING
+========================================= */
+
+.collection-heading {
+  margin: 45px 0 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 20px;
+}
+
+.collection-heading h2 {
+  margin: 8px 0 0;
+  color: var(--navy);
+  font-family: Georgia, serif;
+  font-size: 31px;
+  font-weight: 500;
+}
+
+.collection-heading > p {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* =========================================
+   CHECKOUT FORM
+========================================= */
+
+.checkout-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
   margin-top: 25px;
 }
 
-.book-card {
-  background-color: white;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
-  text-align: center;
+.checkout-form input,
+.checkout-form textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 13px 15px;
+  border: 1px solid #e1ddd5;
+  border-radius: 7px;
+  background: #fcfbf8;
+  color: var(--ink);
+  font-size: 13px;
+  outline: none;
 }
 
-.book-icon {
-  font-size: 55px;
-  padding: 20px;
-  background-color: #edf2f7;
-  border-radius: 8px;
+.checkout-form input:focus,
+.checkout-form textarea:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(199, 163, 107, 0.12);
 }
 
-.book-card h3 {
-  margin-bottom: 8px;
+.checkout-form textarea {
+  min-height: 90px;
+  resize: vertical;
+  grid-column: 1 / -1;
 }
 
-.book-card p {
-  color: #666;
+.checkout-form button {
+  justify-self: start;
 }
 
-.book-card strong {
+.checkout-form button.secondary-button {
+  margin-left: 0;
+}
+
+/* =========================================
+   ORDER CARDS
+========================================= */
+
+.order-card {
+  margin-top: 18px;
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: #fff;
+  box-shadow: 0 4px 15px rgba(31, 45, 61, 0.04);
+}
+
+.order-card > strong {
   display: block;
-  font-size: 20px;
-  margin: 15px 0;
-  color: #243b53;
+  margin-bottom: 13px;
+  color: var(--navy);
+  font-size: 14px;
+  overflow-wrap: anywhere;
 }
 
-.book-card button {
-  background-color: #243b53;
-  color: white;
-  border: none;
-  padding: 12px 20px;
+.order-card p {
+  margin: 8px 0;
+  color: #65717d;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.seller-status-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 17px;
+}
+
+.seller-status-actions button {
+  padding: 9px 13px;
+  border: 1px solid var(--border);
   border-radius: 6px;
-  cursor: pointer;
+  background: #f6f2e9;
+  color: var(--navy);
+  font-size: 11px;
+  font-weight: 700;
 }
 
-.book-card button:hover {
-  background-color: #365a78;
+.seller-status-actions button:hover {
+  background: var(--gold-light);
 }
 
-footer {
+/* =========================================
+   FOOTER
+========================================= */
+
+.app-footer {
+  width: 100%;
+  padding: 30px 20px;
   text-align: center;
-  background-color: #243b53;
+  background: var(--navy);
   color: white;
-  padding: 20px;
+}
+
+.footer-brand {
+  color: var(--gold-light);
+  font-family: Georgia, serif;
+  font-size: 24px;
+}
+
+.app-footer p {
+  margin: 8px 0 15px;
+  color: #c3ccd4;
+  font-family: Georgia, serif;
+  font-size: 13px;
+  font-style: italic;
+}
+
+.app-footer > span {
+  color: #aeb9c4;
+  font-size: 9px;
+  letter-spacing: 1.7px;
+}
+
+/* =========================================
+   RESPONSIVE DESIGN
+========================================= */
+
+@media (max-width: 850px) {
+  .dashboard-content {
+    padding: 28px 4% 40px;
+  }
+
+  .bookstore-hero {
+    grid-template-columns: 1fr;
+    padding: 35px 6%;
+  }
+
+  .hero-copy {
+    max-width: 100%;
+  }
+
+  .hero-image {
+    min-height: 300px;
+  }
+
+  .collection-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
+  }
 }
 
 @media (max-width: 600px) {
   .header {
-    flex-direction: column;
-    gap: 15px;
+    padding: 17px 5%;
+    min-height: auto;
   }
 
-  .hero h2 {
-    font-size: 26px;
+  .brand-area {
+    gap: 10px;
+  }
+
+  .brand-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 21px;
+  }
+
+  .brand-area h1 {
+    font-size: 20px;
+  }
+
+  .welcome-text {
+    font-size: 8px;
+    letter-spacing: 1px;
+  }
+
+  .logout-button {
+    padding: 9px 12px;
+    font-size: 11px;
+  }
+
+  .dashboard-nav {
+    justify-content: flex-start;
+    padding: 10px 4%;
+    gap: 6px;
+  }
+
+  .dashboard-nav button {
+    padding: 10px 12px;
+    font-size: 11px;
+  }
+
+  .dashboard-content {
+    padding: 22px 4% 35px;
+  }
+
+  .integration-panel {
+    padding: 22px 17px;
+  }
+
+  .integration-panel h2 {
+    font-size: 25px;
+  }
+
+  .bookstore-hero {
+    padding: 30px 22px;
+  }
+
+  .hero-copy h2 {
+    font-size: 37px;
+  }
+
+  .hero-copy > p {
+    font-size: 13px;
+  }
+
+  .hero-image {
+    min-height: 250px;
+  }
+
+  .book-photo-grid {
+    height: 245px;
+  }
+
+  .hero-stats {
+    gap: 20px;
+  }
+
+  .reading-banner {
+    padding: 30px 18px;
+  }
+
+  .reading-banner h2 {
+    font-size: 24px;
+  }
+
+  .collection-heading h2 {
+    font-size: 27px;
+  }
+
+  .checkout-form {
+    grid-template-columns: 1fr;
+  }
+
+  .checkout-form textarea {
+    grid-column: auto;
+  }
+
+  .checkout-form button.secondary-button {
+    margin-left: 0;
+  }
+
+  .order-card {
+    padding: 17px;
+  }
+
+  .app-footer > span {
+    font-size: 8px;
+    letter-spacing: 1px;
   }
 }
